@@ -6,24 +6,23 @@
 /*   By: gverissi <gverissi@student.42.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/24 13:45:51 by gverissi          #+#    #+#             */
-/*   Updated: 2023/09/23 17:26:06 by gverissi         ###   ########.fr       */
+/*   Updated: 2023/09/29 15:01:33 by gverissi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LIBFT_H
 # define LIBFT_H
 
-# include	<unistd.h>
-# include	<stdlib.h>
-# include	<stdbool.h>
+# include <unistd.h>
+# include <stdlib.h>
+# include <stdbool.h>
 
 # define INT_MI -2147483648
 # define INT_MA 2147483648
 
 typedef unsigned int	t_u32;
 
-
-int	ft_atoi(const char *str);
+int		ft_atoi(const char *str);
 void	ft_bzero(void *s, size_t n);
 void	*ft_calloc(size_t count, size_t size);
 int		ft_isalnum(int c);

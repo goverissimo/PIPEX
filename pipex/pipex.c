@@ -6,7 +6,7 @@
 /*   By: gverissi <gverissi@student.42.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 15:10:53 by gverissi          #+#    #+#             */
-/*   Updated: 2023/09/28 18:01:49 by gverissi         ###   ########.fr       */
+/*   Updated: 2023/09/29 14:59:28 by gverissi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,22 +33,81 @@ int	update_path(char **env, t_pipex *pipex)
 	return (1);
 }
 
-/*TODO: CHECK FREES*/
 char	*get_cmd(t_pipex *pipex, char *cmd)
 {
-	char	*command;
 	char	**paths;
+	char	*command_path;
+	char	*complete_path;
 
 	paths = pipex->cmd_paths;
 	while (*paths)
 	{
-		command = ft_strjoin(ft_strjoin(*paths, "/"), cmd);
-		if (access(command, F_OK) == 0)
+		command_path = ft_strjoin(*paths, "/");
+		complete_path = ft_strjoin(command_path, cmd);
+		if (access(complete_path, F_OK) == 0)
 		{
-			return (command);
+			free(command_path);
+			return (complete_path);
 		}
-		free(command);
+		free(command_path);
+		free(complete_path);
 		paths++;
 	}
 	return (NULL);
+}
+
+void	run_cmd(t_pipex *pipex, int cmd_index)
+{
+	char	*path;
+	char	*env[2];
+	char	**list_cmd;
+
+	env[0] = pipex->path;
+	env[1] = NULL;
+	list_cmd = ft_split(pipex->cmd_args[cmd_index], ' ');
+	path = get_cmd(pipex, list_cmd[0]);
+	if (!path)
+	{
+		perror("Command not found");
+		exit(EXIT_FAILURE);
+	}
+	if (execve(path, list_cmd, env) == -1)
+	{
+		perror("Error executing command");
+		free(path);
+	}
+	free(path);
+}
+
+void	execute_pipex(t_pipex *pipex)
+{
+	if (pipe(pipex->tube) == -1)
+		error_msg("Error creating pipe");
+	pipex->pid1 = fork();
+	if (pipex->pid1 < 0)
+		error_msg("Error forking process");
+	if (pipex->pid1 == 0)
+	{
+		close(pipex->tube[1]);
+		dup2(pipex->tube[0], STDIN_FILENO);
+		close(pipex->tube[0]);
+		dup2(pipex->out_file, STDOUT_FILENO);
+		run_cmd(pipex, 0);
+		exit(EXIT_FAILURE);
+	}
+	else
+	{
+		close(pipex->tube[0]);
+		dup2(pipex->in_file, STDIN_FILENO);
+		dup2(pipex->tube[1], STDOUT_FILENO);
+		close(pipex->tube[1]);
+		run_cmd(pipex, 1);
+		waitpid(pipex->pid1, NULL, 0);
+	}
+}
+
+void	error_msg(char *error)
+{
+	perror(error);
+	exit(1);
 }
