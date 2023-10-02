@@ -74,7 +74,6 @@ void	run_cmd(t_pipex *pipex, int cmd_index)
 	if (execve(path, list_cmd, env) == -1)
 	{
 		perror("Error executing command");
-		free(path);
 	}
 	free(path);
 }

@@ -6,7 +6,7 @@
 #    By: gverissi <gverissi@student.42.com>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/09/29 15:02:37 by gverissi          #+#    #+#              #
-#    Updated: 2023/09/29 15:02:47 by gverissi         ###   ########.fr        #
+#    Updated: 2023/10/02 12:52:04 by gverissi         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,6 +18,7 @@ CC = cc
 
 CFLAGS = -Wall -Werror -Wextra -g -fsanitize=address
 
+
 RM = rm -f
 
 AR = ar -rsc
@@ -28,6 +29,7 @@ OBJ = $(SRC:.c=.o)
 
 all: $(NAME)
 
+	
 $(NAME): $(OBJ)
 	@make -C ./libft
 	@mv ./libft/$(LIBFT) .
@@ -44,5 +46,5 @@ fclean: clean
 	$(RM) $(NAME)
 
 re: fclean all
-	
-.PHONE: all clean fclan re
+
+.PHONE: all clean fclan re debug
