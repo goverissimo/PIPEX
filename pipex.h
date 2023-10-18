@@ -34,4 +34,5 @@ char	*get_cmd(t_pipex *pipex, char *cmd);
 void	run_cmd(t_pipex *pipex, int cmd_index);
 void	execute_pipex(t_pipex *pipex);
 void	error_msg(char *error);
+
 #endif

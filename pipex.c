@@ -87,22 +87,19 @@ void	execute_pipex(t_pipex *pipex)
 		error_msg("Error forking process");
 	if (pipex->pid1 == 0)
 	{
-		close(pipex->tube[1]);
-		dup2(pipex->tube[0], STDIN_FILENO);
-		close(pipex->tube[0]);
-		dup2(pipex->out_file, STDOUT_FILENO);
-		run_cmd(pipex, 0);
-		exit(EXIT_FAILURE);
-	}
-	else
-	{
-		close(pipex->tube[0]);
 		dup2(pipex->in_file, STDIN_FILENO);
+		close(pipex->tube[0]);
 		dup2(pipex->tube[1], STDOUT_FILENO);
 		close(pipex->tube[1]);
-		run_cmd(pipex, 1);
-		waitpid(pipex->pid1, NULL, 0);
+		run_cmd(pipex, 0);
+		exit(0);
 	}
+	waitpid(pipex->pid1, NULL, WNOHANG);
+	dup2(pipex->tube[0], STDIN_FILENO);
+	close(pipex->tube[0]);
+	dup2(pipex->out_file, STDOUT_FILENO);
+	close(pipex->tube[1]);
+	run_cmd(pipex, 1);
 }
 
 void	error_msg(char *error)

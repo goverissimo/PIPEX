@@ -18,14 +18,14 @@ int	main(int argc, char **argv, char **env)
 
 	if (argc != 5)
 	{
-		ft_putendl_fd("Error, please enter 5 arguments", 1);
+		ft_putendl_fd("Error, please enter 4 arguments", 1);
 		exit(EXIT_FAILURE);
 	}
 	pipex.cmd_args = &argv[2];
-	pipex.in_file = open(argv[1], O_RDONLY);
+	pipex.in_file = open(argv[1], O_RDONLY, 0777);
 	if (pipex.in_file < 0)
 		error_msg("error");
-	pipex.out_file = open(argv[argc - 1], O_TRUNC | O_CREAT | O_RDWR, 0000644);
+	pipex.out_file = open(argv[argc - 1], O_TRUNC | O_CREAT | O_RDWR, 0777);
 	if (pipex.out_file < 0)
 		error_msg("error");
 	if (!update_path(env, &pipex))

@@ -16,7 +16,7 @@ LIBFT = libft.a
 
 CC = cc
 
-CFLAGS = -Wall -Werror -Wextra -g -fsanitize=address
+CFLAGS = -Wall -Werror -Wextra -g #-fsanitize=address
 
 
 RM = rm -f
@@ -47,4 +47,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONE: all clean fclan re debug
+.PHONE: all clean fclan re
