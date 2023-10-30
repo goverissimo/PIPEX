@@ -12,6 +12,27 @@
 
 #include "pipex.h"
 
+void	error_msg(char *error)
+{
+	perror(error);
+	exit(1);
+}
+
+void	free_cmd_paths(char **cmd_paths)
+{
+	int	i;
+
+	i = 0;
+	if (!cmd_paths)
+		return ;
+	while (cmd_paths[i])
+	{
+		free(cmd_paths[i]);
+		i++;
+	}
+	free(cmd_paths);
+}
+
 int	main(int argc, char **argv, char **env)
 {
 	t_pipex	pipex;
@@ -31,4 +52,5 @@ int	main(int argc, char **argv, char **env)
 	if (!update_path(env, &pipex))
 		error_msg("Unable to get CMD paths");
 	execute_pipex(&pipex);
+	free_cmd_paths(pipex.cmd_paths);
 }

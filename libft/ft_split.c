@@ -55,26 +55,35 @@ static char	*ft_wrdup(char const *s, char ch, char **strs)
 	return ((char *)s + c);
 }
 
+static void	clean_mem(char **strs)
+{
+	while (strs-- != 0)
+		free(*strs);
+}
+
 char	**ft_split(char const *s, char ch)
 {
 	char	**strz;
 	char	**strs;
 
 	strs = (char **)malloc((ft_count_words(s, ch) + 1) * sizeof(char *));
-	if (!strs)
-		return (NULL);
 	strz = strs;
+	if (!strs)
+	{
+		clean_mem(strs);
+		return (NULL);
+	}
 	if (*s != '\0' && ch == '\0')
 	{
 		*strs++ = ft_strdup((char *)s);
 		*strs = NULL;
 		return (strz);
 	}
-	while (*s != '\0' && ch != '\0')
+	while (*s != '\0')
 	{
-		if (*s != '\0' && *s != ch)
+		if (*s != ch)
 			s = ft_wrdup(s, ch, strs++);
-		while (*s == ch)
+		else
 			s++;
 	}
 	*strs = NULL;

@@ -23,7 +23,7 @@ RM = rm -f
 
 AR = ar -rsc
 
-SRC = pipex.c main.c
+SRC = pipex.c main.c path_upd.c
 
 OBJ = $(SRC:.c=.o)
 

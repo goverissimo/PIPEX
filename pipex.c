@@ -12,76 +12,8 @@
 
 #include "pipex.h"
 
-int	update_path(char **env, t_pipex *pipex)
+static void	execute_first_cmd(t_pipex *pipex)
 {
-	int	i;
-
-	i = 0;
-	while (env[i++])
-	{
-		if (ft_strncmp(env[i], "PATH=", 5) == 0)
-		{
-			pipex->path = env[i] + 5;
-			break ;
-		}
-	}
-	if (!pipex->path)
-		return (0);
-	pipex->cmd_paths = ft_split(pipex->path, ':');
-	if (!pipex->cmd_paths)
-		return (0);
-	return (1);
-}
-
-char	*get_cmd(t_pipex *pipex, char *cmd)
-{
-	char	**paths;
-	char	*command_path;
-	char	*complete_path;
-
-	paths = pipex->cmd_paths;
-	while (*paths)
-	{
-		command_path = ft_strjoin(*paths, "/");
-		complete_path = ft_strjoin(command_path, cmd);
-		if (access(complete_path, F_OK) == 0)
-		{
-			free(command_path);
-			return (complete_path);
-		}
-		free(command_path);
-		free(complete_path);
-		paths++;
-	}
-	return (NULL);
-}
-
-void	run_cmd(t_pipex *pipex, int cmd_index)
-{
-	char	*path;
-	char	*env[2];
-	char	**list_cmd;
-
-	env[0] = pipex->path;
-	env[1] = NULL;
-	list_cmd = ft_split(pipex->cmd_args[cmd_index], ' ');
-	path = get_cmd(pipex, list_cmd[0]);
-	if (!path)
-	{
-		perror("Command not found");
-		exit(EXIT_FAILURE);
-	}
-	if (execve(path, list_cmd, env) == -1)
-	{
-		perror("Error executing command");
-	}
-	free(path);
-}
-
-void	execute_pipex(t_pipex *pipex)
-{
-	if (pipe(pipex->tube) == -1)
-		error_msg("Error creating pipe");
 	pipex->pid1 = fork();
 	if (pipex->pid1 < 0)
 		error_msg("Error forking process");
@@ -94,16 +26,37 @@ void	execute_pipex(t_pipex *pipex)
 		run_cmd(pipex, 0);
 		exit(0);
 	}
-	waitpid(pipex->pid1, NULL, WNOHANG);
-	dup2(pipex->tube[0], STDIN_FILENO);
-	close(pipex->tube[0]);
-	dup2(pipex->out_file, STDOUT_FILENO);
-	close(pipex->tube[1]);
-	run_cmd(pipex, 1);
 }
 
-void	error_msg(char *error)
+static void	execute_second_cmd(t_pipex *pipex)
 {
-	perror(error);
-	exit(1);
+	pipex->pid2 = fork();
+	if (pipex->pid2 < 0)
+		error_msg("Error forking process");
+	if (pipex->pid2 == 0)
+	{
+		close(pipex->tube[1]);
+		dup2(pipex->tube[0], STDIN_FILENO);
+		dup2(pipex->out_file, STDOUT_FILENO);
+		close(pipex->tube[0]);
+		run_cmd(pipex, 1);
+		exit(0);
+	}
+}
+
+static void	wait_for_children(t_pipex *pipex)
+{
+	close(pipex->tube[0]);
+	close(pipex->tube[1]);
+	waitpid(pipex->pid1, NULL, 0);
+	waitpid(pipex->pid2, NULL, 0);
+}
+
+void	execute_pipex(t_pipex *pipex)
+{
+	if (pipe(pipex->tube) == -1)
+		error_msg("Error creating pipe");
+	execute_first_cmd(pipex);
+	execute_second_cmd(pipex);
+	wait_for_children(pipex);
 }

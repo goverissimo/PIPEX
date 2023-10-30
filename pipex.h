@@ -21,6 +21,7 @@
 typedef struct s_pipex
 {
 	pid_t	pid1;
+	pid_t	pid2;
 	int		tube[2];
 	int		in_file;
 	int		out_file;
@@ -34,5 +35,6 @@ char	*get_cmd(t_pipex *pipex, char *cmd);
 void	run_cmd(t_pipex *pipex, int cmd_index);
 void	execute_pipex(t_pipex *pipex);
 void	error_msg(char *error);
+void	free_cmd_paths(char **cmd_paths);
 
 #endif
